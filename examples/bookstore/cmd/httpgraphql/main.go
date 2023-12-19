@@ -9,7 +9,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/regeda/turboql/examples/bookstore/pkg/bookstore"
 )
@@ -22,14 +22,14 @@ var (
 func main() {
 	flag.Parse()
 
-	cfg, err := pgx.ParseConfig(os.Getenv("PG_URI"))
+	cfg, err := pgxpool.ParseConfig(os.Getenv("PG_URI"))
 	if err != nil {
 		log.Fatalf("Could not parse PG_URI env var: %v", err)
 	}
 
 	ctx := context.Background()
 
-	db, err := pgx.ConnectConfig(ctx, cfg)
+	db, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
 		log.Fatalf("Could not connect to the database: %v", err)
 	}
