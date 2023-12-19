@@ -17,8 +17,7 @@ func (v date) MarshalJSON() ([]byte, error) {
 }
 
 func serializeDate(value any) any {
-	switch v := value.(type) {
-	case time.Time:
+	if v, ok := value.(time.Time); ok {
 		return date{Time: v}
 	}
 	return nil

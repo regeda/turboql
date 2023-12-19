@@ -7,8 +7,7 @@ import (
 )
 
 func serializeNumeric(value any) any {
-	switch v := value.(type) {
-	case pgtype.Numeric:
+	if v, ok := value.(pgtype.Numeric); ok {
 		return v
 	}
 	return nil
