@@ -3,6 +3,8 @@ export PATH := $(GOBIN):$(PATH)
 
 SHELL := env PATH=$(PATH) /bin/sh
 
+GOLANGLINT_VERSION := 1.55.2
+
 PG_HOST ?= localhost
 PG_PORT ?= 5432
 PG_USER ?= postgres
@@ -12,6 +14,16 @@ PG_DSN ?= $(PG_USER)@$(PG_HOST):$(PG_PORT)/$(PG_DB)?sslmode=disable
 export PG_URI := postgresql://$(PG_DSN)
 
 GOFLAGS ?=
+
+$(GOBIN):
+	mkdir -p $(GOBIN)
+
+$(GOBIN)/golangci-lint: $(GOBIN)
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOBIN) v$(GOLANGLINT_VERSION)
+
+.PHONY: lint
+lint: $(GOBIN)/golangci-lint
+	golangci-lint run --timeout 10m ./...
 
 .PHONY: tidy
 tidy:
@@ -27,14 +39,18 @@ docker-down:
 
 .PHONY: migrate-up
 migrate-up:
-	bash examples/gravity/install/sample_db/install.sh
+	bash examples/bookstore/install/sample_db/install.sh
 
 .PHONY: run
 run:
-	go run examples/gravity/cmd/httpgraphql/main.go
+	go run examples/bookstore/cmd/httpgraphql/main.go
 
 .PHONY: generate
 generate:
-	mkdir -p examples/gravity/internal/gravity
-	go run cmd/turboqlgen/main.go --package-name=gravity > examples/gravity/internal/gravity/graphql.go
+	mkdir -p examples/bookstore/pkg/bookstore
+	go run cmd/turboqlgen/main.go --package-name=bookstore > examples/bookstore/pkg/bookstore/graphql_gen.go
 	goimports -w .
+
+.PHONY: test
+test:
+	GOGC=off go test $(GOFLAGS) -race ./... -count 1

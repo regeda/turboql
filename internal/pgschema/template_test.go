@@ -1,21 +1,26 @@
 package pgschema_test
 
 import (
-	"os"
+	"bytes"
+	"fmt"
+	"go/format"
 	"testing"
 
 	"github.com/regeda/turboql/internal/pgschema"
+
 	"github.com/stretchr/testify/require"
 )
 
 func Test_Builder_Execute(t *testing.T) {
-	b, err := pgschema.NewBuilder(os.Stdout)
+	buf := new(bytes.Buffer)
 
-	require.NoError(t, err, "pgschema.NewBuilder")
+	b, err := pgschema.NewBuilder(buf)
+
+	require.NoError(t, err)
 
 	err = b.Execute(pgschema.BuilderParams{
 		Package: pgschema.Package{
-			Name: "test",
+			Name: "pgschema_test",
 		},
 		Schema: pgschema.NewSchema(
 			[]pgschema.Table{
@@ -67,4 +72,10 @@ func Test_Builder_Execute(t *testing.T) {
 	})
 
 	require.NoError(t, err)
+
+	formattedContent, err := format.Source(buf.Bytes())
+
+	require.NoError(t, err)
+
+	fmt.Println(string(formattedContent))
 }
