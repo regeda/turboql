@@ -12,12 +12,12 @@ The database schema must be properly designed with the valid foreign key constra
 
 Setup the generator:
 ```
-go get github.com/regeda/turboql/cmd/turboqlgen
+go get -u github.com/regeda/turboql/cmd/turboqlgen
 ```
 
 Connect to your database and generate the GraphQL schema:
 ```
-PG_URI=postgres://localhost:5432/postgres?sslmode=disable turboqlgen
+PG_URI='postgres://localhost:5432/postgres?sslmode=disable' turboqlgen
 ```
 
 ## Example

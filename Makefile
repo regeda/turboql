@@ -21,6 +21,10 @@ $(GOBIN):
 $(GOBIN)/golangci-lint: $(GOBIN)
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOBIN) v$(GOLANGLINT_VERSION)
 
+.PHONY: clean
+clean:
+	rm -rf $(GOBIN)
+
 .PHONY: lint
 lint: $(GOBIN)/golangci-lint
 	golangci-lint run --timeout 10m ./...
