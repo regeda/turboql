@@ -1,12 +1,10 @@
 # TurboQL
 
-TurboQL generates the GraphQL schema for your database. TurboQL supports the PostgreSQL database only.
+TurboQL is a tool designed to automatically generate GraphQL schemas tailored to your PostgreSQL database. It exclusively supports PostgreSQL databases.
 
-The generator converts the information schema from the database to the corresponding GraphQL models and objects.
+The generator seamlessly translates the information schema of your database into corresponding GraphQL models and objects. Notably, TurboQL focuses on creating GraphQL schemas specifically for read-only operations and does not accommodate mutations.
 
-Actually, the generator makes the GraphQL schema for read-only purposes and does not support mutations.
-
-The database schema must be properly designed with the valid foreign key constraints in order to generate a proper relationship between GraphQL objects.
+It is crucial to ensure that your database schema is thoroughly designed with valid foreign key constraints. This is essential for establishing meaningful relationships between GraphQL objects during the schema generation process.
 
 ## Getting started
 
