@@ -31,7 +31,7 @@ func main() {
 
 	db, err := pgxpool.NewWithConfig(ctx, cfg)
 	if err != nil {
-		log.Fatalf("Could not connect to the database: %v", err)
+		log.Fatalf("Could not connect to the database: %v, check your PG_URI environment variable", err)
 	}
 
 	rootQuery := graphql.ObjectConfig{
