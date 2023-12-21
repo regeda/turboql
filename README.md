@@ -10,7 +10,7 @@ It is crucial to ensure that your database schema is thoroughly designed with va
 
 Setup the generator:
 ```
-go get -u github.com/regeda/turboql/cmd/turboqlgen
+go install github.com/regeda/turboql/cmd/turboqlgen
 ```
 
 Connect to your database and generate the GraphQL schema:

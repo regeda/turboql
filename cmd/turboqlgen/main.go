@@ -19,14 +19,6 @@ var (
 func main() {
 	flag.Parse()
 
-	if *packageName == "" {
-		log.Fatal("Specify -package-name")
-	}
-
-	if *pgSchema == "" {
-		log.Fatal("Specify -pg-schema")
-	}
-
 	cfg, err := pgx.ParseConfig(os.Getenv("PG_URI"))
 	if err != nil {
 		log.Fatalf("Could not parse PG_URI env var: %v", err)
@@ -36,7 +28,7 @@ func main() {
 
 	db, err := pgx.ConnectConfig(ctx, cfg)
 	if err != nil {
-		log.Fatalf("Could not connect to the database: %v", err)
+		log.Fatalf("Could not connect to the database: %v, check your PG_URI environment variable", err)
 	}
 
 	tables, err := pgschema.Scan(ctx, db, *pgSchema)
