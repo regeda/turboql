@@ -24,10 +24,7 @@ jobs:
       with:
         go-version-file: 'go.mod'
     -
-      name: Unshallow
-      run: git fetch --prune --unshallow
-    -
-      name: Create release
+      name: Push Assets
       uses: goreleaser/goreleaser-action@v5
       with:
         version: latest
