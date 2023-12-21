@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser:
+    name: Release Assets
+    runs-on: ubuntu-latest
+    steps:
+    -
+      name: Check out code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    -
+      name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: 'go.mod'
+    -
+      name: Unshallow
+      run: git fetch --prune --unshallow
+    -
+      name: Create release
+      uses: goreleaser/goreleaser-action@v5
+      with:
+        version: latest
+        args: release --clean
+      env:
+        GITHUB_TOKEN: ${{ secrets.MY_TOKEN }}
