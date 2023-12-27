@@ -29,9 +29,7 @@ type {{ .Table.GoType }} struct {
 {{ define "graphql-entry" }}
 "{{ .Table.Name }}": &graphql.Field{
 	Type: graphql.NewList({{ .Table.GraphqlVar }}),
-	Resolve: func(p graphql.ResolveParams) (any, error) {
-		return pgxscan.All(p.Context, pq, scan.StructMapper[*{{ .Table.GoType }}](), "{{ .Table.SQL }}")
-	},
+	Resolve: batcher.GraphqlField[*{{ .Table.GoType }}](pq, "{{ .Table.SQL }}"),
 }
 {{- end }}
 
@@ -79,7 +77,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/regeda/turboql/pkg/batcher"
 	"github.com/regeda/turboql/pkg/graphqlx/scalar"
-	"github.com/stephenafamo/scan"
 	"github.com/stephenafamo/scan/pgxscan"
 )
 
