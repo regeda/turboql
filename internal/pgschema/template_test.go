@@ -43,6 +43,12 @@ func Test_Builder_Execute(t *testing.T) {
 							Num:  3,
 						},
 					},
+					PrimaryKeys: []pgschema.PrimaryKey{
+						{
+							Name:    "pk_foobar",
+							Columns: []int{1, 2},
+						},
+					},
 					ForeignKeys: []pgschema.ForeignKey{
 						{
 							Name:         "bazquux_fk",
@@ -64,6 +70,12 @@ func Test_Builder_Execute(t *testing.T) {
 							Name: "quux",
 							Type: "text",
 							Num:  2,
+						},
+					},
+					PrimaryKeys: []pgschema.PrimaryKey{
+						{
+							Name:    "pk_bazquux",
+							Columns: []int{1},
 						},
 					},
 				},

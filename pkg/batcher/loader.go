@@ -11,7 +11,15 @@ import (
 
 type QueryResolver func(graphql.ResolveParams) (string, []any)
 
-func GraphqlField[V any](pq pgxscan.Queryer, query QueryResolver) graphql.FieldResolveFn {
+func GraphqlOne[V any](pq pgxscan.Queryer, query QueryResolver) graphql.FieldResolveFn {
+	mapper := scan.StructMapper[V]()
+	return func(p graphql.ResolveParams) (any, error) {
+		sql, args := query(p)
+		return pgxscan.One(p.Context, pq, mapper, sql, args...)
+	}
+}
+
+func GraphqlAll[V any](pq pgxscan.Queryer, query QueryResolver) graphql.FieldResolveFn {
 	mapper := scan.StructMapper[V]()
 	return func(p graphql.ResolveParams) (any, error) {
 		sql, args := query(p)

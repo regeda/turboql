@@ -2,6 +2,7 @@ package pgschema
 
 import (
 	"bytes"
+	"strconv"
 
 	"github.com/iancoleman/strcase"
 
@@ -49,15 +50,10 @@ func (t Table) References(schema Schema) []Reference {
 	return schema.References[t.Name]
 }
 
-func (t Table) SQL(ref ...string) string {
+func (t Table) SelectSQL(ref ...string) string {
 	b := new(bytes.Buffer)
 	b.WriteString("select ")
-	for i, c := range t.Columns {
-		if i > 0 {
-			b.WriteByte(',')
-		}
-		b.WriteString(c.Name)
-	}
+	t.writeColumns(b)
 	b.WriteString(" from ")
 	b.WriteString(t.Name)
 	b.WriteString(" where 1=1")
@@ -69,7 +65,35 @@ func (t Table) SQL(ref ...string) string {
 	return b.String()
 }
 
-func (t Table) GraphqlArgs() []graphqlx.Arg {
+func (t Table) InsertSQL() string {
+	b := new(bytes.Buffer)
+	b.WriteString("insert into ")
+	b.WriteString(t.Name)
+	b.WriteByte('(')
+	t.writeColumns(b)
+	b.WriteString(")values(")
+	for i := 1; i <= len(t.Columns); i++ {
+		if i > 1 {
+			b.WriteByte(',')
+		}
+		b.WriteByte('$')
+		b.WriteString(strconv.Itoa(i))
+	}
+	b.WriteString(")returning ")
+	t.writeColumns(b)
+	return b.String()
+}
+
+func (t Table) writeColumns(b *bytes.Buffer) {
+	for i, c := range t.Columns {
+		if i > 0 {
+			b.WriteByte(',')
+		}
+		b.WriteString(c.Name)
+	}
+}
+
+func (t Table) GraphqlQueryArgs() []graphqlx.Arg {
 	var args []graphqlx.Arg
 	for _, c := range t.Columns {
 		if f, ok := c.FilterType(); ok {
@@ -78,6 +102,18 @@ func (t Table) GraphqlArgs() []graphqlx.Arg {
 				Type: f,
 			})
 		}
+	}
+	return args
+}
+
+func (t Table) GraphqlCreateArgs() []graphqlx.Arg {
+	var args []graphqlx.Arg
+	for _, c := range t.Columns {
+		args = append(args, graphqlx.Arg{
+			Name:    c.Name,
+			Type:    c.GraphqlType(),
+			NonNull: c.NotNull,
+		})
 	}
 	return args
 }
