@@ -6,6 +6,7 @@ require (
 	github.com/graph-gophers/dataloader/v7 v7.1.0
 	github.com/graphql-go/graphql v0.8.1
 	github.com/graphql-go/handler v0.2.3
+	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.5.1
 	github.com/pkg/errors v0.9.1
 	github.com/stephenafamo/scan v0.5.0

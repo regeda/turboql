@@ -34,13 +34,8 @@ func main() {
 		log.Fatalf("Could not connect to the database: %v, check your PG_URI environment variable", err)
 	}
 
-	rootQuery := graphql.ObjectConfig{
-		Name:   "RootQuery",
-		Fields: bookstore.CreateFields(db),
-	}
-	schemaConfig := graphql.SchemaConfig{
-		Query: graphql.NewObject(rootQuery),
-	}
+	schemaConfig := bookstore.NewSchemaConfig(db)
+
 	schema, err := graphql.NewSchema(schemaConfig)
 	if err != nil {
 		log.Fatalf("failed to create new schema: %v", err)

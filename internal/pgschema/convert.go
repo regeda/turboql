@@ -31,3 +31,12 @@ var graphqlTypes = map[string]string{
 	"bytea":                       "graphql.String",
 	"numeric":                     "scalar.Numeric",
 }
+
+var filterTypes = map[string]string{
+	"text":              "filter.String",
+	"uuid":              "filter.String",
+	"integer":           "filter.Int",
+	"bigint":            "filter.Int",
+	"character":         "filter.String",
+	"character varying": "filter.String",
+}

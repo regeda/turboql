@@ -26,10 +26,23 @@ type {{ .Table.GoType }} struct {
 })
 {{- end }}
 
+{{ define "graphql-filter" }}
+{{ .Table.FilterVar }} := filter.NewCursorInput("{{ .Table.Title }}Filter", graphql.InputObjectConfigFieldMap{
+{{- range .Table.GraphqlArgs }}
+  "{{ .Name }}": &graphql.InputObjectFieldConfig{
+    Type: {{ .Type }},
+  },
+{{- end }}
+})
+{{- end }}
+
 {{ define "graphql-entry" }}
 "{{ .Table.Name }}": &graphql.Field{
 	Type: graphql.NewList({{ .Table.GraphqlVar }}),
-	Resolve: batcher.GraphqlField[*{{ .Table.GoType }}](pq, "{{ .Table.SQL }}"),
+  Args: {{ .Table.FilterVar }},
+  Resolve: batcher.GraphqlField[*{{ .Table.GoType }}](pq, func(p graphql.ResolveParams) (string, []any) {
+    return filter.SQL("{{ .Table.SQL }}", nil, p)
+  }),
 }
 {{- end }}
 
@@ -37,7 +50,7 @@ type {{ .Table.GoType }} struct {
 {{ range .References }}
 {{ $ref := . }}
 
-{{ $ref.Table.Name }}{{ $.Table.Name }}Loader := batcher.NewLoader[{{ $ref.ForeignColumn.GoType }}, *{{ $.Table.GoType }}](
+{{ $ref.Table.Var }}{{ $.Table.Title }}Loader := batcher.NewLoader(
 	pq,
 	func(v *{{ $.Table.GoType }}) {{ $ref.ForeignColumn.GoType }} {
 		return v.{{ $ref.ForeignColumn.Title }}
@@ -47,12 +60,12 @@ type {{ .Table.GoType }} struct {
 {{ $ref.Table.GraphqlVar }}.AddFieldConfig("{{ $.Table.Name }}", &graphql.Field{
 	Type: {{ $.Table.GraphqlVar }},
 	Resolve: func(p graphql.ResolveParams) (any, error) {
-		thunk := {{ $ref.Table.Name }}{{ $.Table.Name }}Loader.Load(p.Context, p.Source.(*{{ $ref.Table.GoType }}).{{ $ref.Column.Title }})
+		thunk := {{ $ref.Table.Var }}{{ $.Table.Title }}Loader.Load(p.Context, p.Source.(*{{ $ref.Table.GoType }}).{{ $ref.Column.Title }})
 		return func() (any, error) { return thunk() }, nil
 	},
 })
 
-{{ $.Table.Name }}{{ $ref.Table.Name }}Loader := batcher.NewListLoader[{{ $ref.Column.GoType }}, *{{ $ref.Table.GoType }}](
+{{ $.Table.Var }}{{ $ref.Table.Title }}Loader := batcher.NewListLoader(
 	pq,
 	func(v *{{ $ref.Table.GoType }}) {{ $ref.Column.GoType }} {
 		return v.{{ $ref.Column.Title }}
@@ -62,7 +75,7 @@ type {{ .Table.GoType }} struct {
 {{ $.Table.GraphqlVar }}.AddFieldConfig("{{ $ref.Name }}", &graphql.Field{
 	Type: graphql.NewList({{ $ref.Table.GraphqlVar }}),
 	Resolve: func(p graphql.ResolveParams) (any, error) {
-		thunk := {{ $.Table.Name }}{{ $ref.Table.Name }}Loader.Load(p.Context, p.Source.(*{{ $.Table.GoType }}).{{ $ref.ForeignColumn.Title }})
+		thunk := {{ $.Table.Var }}{{ $ref.Table.Title }}Loader.Load(p.Context, p.Source.(*{{ $.Table.GoType }}).{{ $ref.ForeignColumn.Title }})
 		return func() (any, error) { return thunk() }, nil
 	},
 })
@@ -76,19 +89,27 @@ import (
 	"github.com/graphql-go/graphql"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/regeda/turboql/pkg/batcher"
+	"github.com/regeda/turboql/pkg/graphqlx/filter"
 	"github.com/regeda/turboql/pkg/graphqlx/scalar"
 	"github.com/stephenafamo/scan/pgxscan"
 )
 
 {{- range .Schema.Tables }} {{ template "table-model" (args "Table" .) }} {{ end }}
 
-func CreateFields(pq pgxscan.Queryer) graphql.Fields {
+func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 	{{- range .Schema.Tables }} {{ template "graphql-object" (args "Table" .) }} {{ end }}
+
+  {{- range .Schema.Tables }} {{ template "graphql-filter" (args "Table" .) }} {{ end }}
 
 	{{- range .Schema.Tables }} {{ template "graphql-refs" (args "Table" . "References" (.References $.Schema)) }} {{ end }}
 
-	return graphql.Fields{
-		{{- range .Schema.Tables }} {{ template "graphql-entry" (args "Table" .) }},  {{ end }}
-	}
+  return graphql.SchemaConfig{
+    Query: graphql.NewObject(graphql.ObjectConfig{
+      Name: "Query",
+      Fields: graphql.Fields{
+		    {{- range .Schema.Tables }} {{ template "graphql-entry" (args "Table" .) }},  {{ end }}
+	    },
+    }),
+  }
 }
 {{- end }}

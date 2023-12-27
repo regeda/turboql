@@ -9,10 +9,13 @@ import (
 	"github.com/stephenafamo/scan/pgxscan"
 )
 
-func GraphqlField[V any](pq pgxscan.Queryer, query string) graphql.FieldResolveFn {
+type QueryResolver func(graphql.ResolveParams) (string, []any)
+
+func GraphqlField[V any](pq pgxscan.Queryer, query QueryResolver) graphql.FieldResolveFn {
 	mapper := scan.StructMapper[V]()
 	return func(p graphql.ResolveParams) (any, error) {
-		return pgxscan.All(p.Context, pq, mapper, query)
+		sql, args := query(p)
+		return pgxscan.All(p.Context, pq, mapper, sql, args...)
 	}
 }
 

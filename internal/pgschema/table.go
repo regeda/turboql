@@ -2,18 +2,22 @@ package pgschema
 
 import (
 	"bytes"
-	"strings"
+
+	"github.com/iancoleman/strcase"
+
+	"github.com/regeda/turboql/pkg/graphqlx"
 )
 
 type Table struct {
 	Schema      string `db:"schemaname"`
 	Name        string `db:"tablename"`
 	Columns     []Column
+	PrimaryKeys []PrimaryKey
 	ForeignKeys []ForeignKey
 }
 
 func (t Table) Title() string {
-	return strings.Title(t.Name)
+	return strcase.ToCamel(t.Name)
 }
 
 func (t Table) ColumnAt(i int) (Column, bool) {
@@ -25,8 +29,16 @@ func (t Table) ColumnAt(i int) (Column, bool) {
 	return Column{}, false
 }
 
+func (t Table) Var() string {
+	return strcase.ToLowerCamel(t.Name)
+}
+
 func (t Table) GraphqlVar() string {
-	return t.Name + "Type"
+	return t.Var() + "Type"
+}
+
+func (t Table) FilterVar() string {
+	return t.Var() + "Filter"
 }
 
 func (t Table) GoType() string {
@@ -48,10 +60,24 @@ func (t Table) SQL(ref ...string) string {
 	}
 	b.WriteString(" from ")
 	b.WriteString(t.Name)
+	b.WriteString(" where 1=1")
 	if len(ref) > 0 {
-		b.WriteString(" where ")
+		b.WriteString(" and ")
 		b.WriteString(ref[0])
 		b.WriteString(" = any($1)")
 	}
 	return b.String()
+}
+
+func (t Table) GraphqlArgs() []graphqlx.Arg {
+	var args []graphqlx.Arg
+	for _, c := range t.Columns {
+		if f, ok := c.FilterType(); ok {
+			args = append(args, graphqlx.Arg{
+				Name: c.Name,
+				Type: f,
+			})
+		}
+	}
+	return args
 }

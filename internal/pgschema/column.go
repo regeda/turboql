@@ -1,8 +1,6 @@
 package pgschema
 
-import (
-	"strings"
-)
+import "github.com/iancoleman/strcase"
 
 type Column struct {
 	Name    string `db:"attname"`
@@ -12,7 +10,8 @@ type Column struct {
 }
 
 func (c Column) Title() string {
-	return strings.Title(c.Name)
+	return strcase.ToCamel(c.Name)
+
 }
 
 func (c Column) GoType() string {
@@ -29,4 +28,9 @@ func (c Column) GraphqlType() string {
 		return t
 	}
 	return c.Type
+}
+
+func (c Column) FilterType() (string, bool) {
+	t, ok := filterTypes[c.Type]
+	return t, ok
 }
