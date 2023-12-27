@@ -7,14 +7,18 @@ var (
 	Int    = scalarInputFilter(graphql.Int)
 )
 
-func NewCursorInput(name string, filter graphql.InputObjectConfigFieldMap) graphql.FieldConfigArgument {
+func NewArgumentConfig(name string, filter graphql.InputObjectConfigFieldMap) *graphql.ArgumentConfig {
+	return &graphql.ArgumentConfig{
+		Type: graphql.NewInputObject(graphql.InputObjectConfig{
+			Name:   name,
+			Fields: filter,
+		}),
+	}
+}
+
+func NewCursorInput(filter *graphql.ArgumentConfig) graphql.FieldConfigArgument {
 	return graphql.FieldConfigArgument{
-		"filter": &graphql.ArgumentConfig{
-			Type: graphql.NewInputObject(graphql.InputObjectConfig{
-				Name:   name,
-				Fields: filter,
-			}),
-		},
+		"filter": filter,
 		"limit": &graphql.ArgumentConfig{
 			Type: graphql.Int,
 		},
@@ -42,5 +46,4 @@ func scalarInputFilter(in graphql.Input) *graphql.InputObject {
 			},
 		},
 	})
-
 }

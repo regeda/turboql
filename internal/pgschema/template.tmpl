@@ -27,8 +27,8 @@ type {{ .Table.GoType }} struct {
 {{- end }}
 
 {{ define "graphql-query-filter" }}
-{{ .Table.FilterVar }} := filter.NewCursorInput("{{ .Table.Title }}Filter", graphql.InputObjectConfigFieldMap{
-{{- range .Table.GraphqlQueryArgs }}
+{{ .Table.FilterVar }} := filter.NewArgumentConfig("{{ .Table.Title }}Filter", graphql.InputObjectConfigFieldMap{
+{{- range .Table.GraphqlFilterArgs }}
   "{{ .Name }}": &graphql.InputObjectFieldConfig{
     Type: {{ if .NonNull }} graphql.NewNonNull({{ .Type }}) {{ else }} {{ .Type }} {{ end }},
   },
@@ -36,10 +36,23 @@ type {{ .Table.GoType }} struct {
 })
 {{- end }}
 
+{{ define "graphql-table-input" }}
+{{ .Table.InputVar }} := graphql.NewInputObject(graphql.InputObjectConfig{
+  Name: "{{ .Table.Title }}Input",
+  Fields: graphql.InputObjectConfigFieldMap{
+  {{- range .Table.GraphqlColumnArgs }}
+    "{{ .Name }}": &graphql.InputObjectFieldConfig{
+      Type: {{ if .NonNull }} graphql.NewNonNull({{ .Type }}) {{ else }} {{ .Type }} {{ end }},
+    },
+  {{ end }}
+  },
+})
+{{- end }}
+
 {{ define "graphql-query-entry" }}
 "{{ .Table.Name }}": &graphql.Field{
   Type: graphql.NewList({{ .Table.GraphqlVar }}),
-  Args: {{ .Table.FilterVar }},
+  Args: filter.NewCursorInput({{ .Table.FilterVar }}),
   Resolve: batcher.GraphqlAll[*{{ .Table.GoType }}](pq, func(p graphql.ResolveParams) (string, []any) {
     return filter.SQL("{{ .Table.SelectSQL }}", nil, p)
   }),
@@ -47,19 +60,18 @@ type {{ .Table.GoType }} struct {
 {{- end }}
 
 {{ define "graphql-mutate-entry" }}
-{{ $args := .Table.GraphqlCreateArgs }}
+{{ $args := .Table.GraphqlColumnArgs }}
 "create{{ .Table.Title }}": &graphql.Field{
   Type: {{ .Table.GraphqlVar }},
   Args: graphql.FieldConfigArgument{
-  {{- range $args }}
-    "{{ .Name }}": &graphql.ArgumentConfig{
-      Type: {{ if .NonNull }} graphql.NewNonNull({{ .Type }}) {{ else }} {{ .Type }} {{ end }},
+    "{{ .Table.Name }}": &graphql.ArgumentConfig{
+      Type: graphql.NewNonNull({{ .Table.InputVar }}),
     },
-  {{ end }}
   },
   Resolve: batcher.GraphqlOne[*{{ .Table.GoType }}](pq, func(p graphql.ResolveParams) (string, []any) {
+    set := p.Args["{{ .Table.Name }}"].(map[string]any)
     return "{{ .Table.InsertSQL}}", []any{
-    {{- range $args }} p.Args["{{ .Name }}"], {{ end }}
+    {{- range $args }} set["{{ .Name }}"], {{ end }}
     }
   }),
 }
@@ -117,6 +129,8 @@ import (
 
 func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
   {{- range .Schema.Tables }} {{ template "graphql-object" (args "Table" .) }} {{ end }}
+
+  {{- range .Schema.Tables }} {{ template "graphql-table-input" (args "Table" .) }} {{ end }}
 
   {{- range .Schema.Tables }} {{ template "graphql-query-filter" (args "Table" .) }} {{ end }}
 
