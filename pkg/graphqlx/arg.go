@@ -1,6 +1,7 @@
 package graphqlx
 
 type Arg struct {
-	Name string
-	Type string
+	Name    string
+	Type    string
+	NonNull bool
 }

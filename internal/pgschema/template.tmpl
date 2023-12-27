@@ -1,9 +1,9 @@
 {{ define "graphql-field" }}
 "{{ .Column.Name }}": &graphql.Field{
-	Type: {{ .Column.GraphqlType }},
-	Resolve: func(p graphql.ResolveParams) (any, error) {
-		return p.Source.(*{{ .Table.GoType }}).{{ .Column.Title }}, nil
-	},
+  Type: {{ .Column.GraphqlType }},
+  Resolve: func(p graphql.ResolveParams) (any, error) {
+    return p.Source.(*{{ .Table.GoType }}).{{ .Column.Title }}, nil
+  },
 }
 {{- end }}
 
@@ -19,29 +19,48 @@ type {{ .Table.GoType }} struct {
 
 {{ define "graphql-object" }}
 {{ .Table.GraphqlVar }} := graphql.NewObject(graphql.ObjectConfig{
-	Name: "{{ .Table.GoType }}",
-	Fields: graphql.Fields{
-		{{- range .Table.Columns }} {{ template "graphql-field" (args "Column" . "Table" $.Table) }}, {{ end }}
-	},
+  Name: "{{ .Table.GoType }}",
+  Fields: graphql.Fields{
+    {{- range .Table.Columns }} {{ template "graphql-field" (args "Column" . "Table" $.Table) }}, {{ end }}
+  },
 })
 {{- end }}
 
-{{ define "graphql-filter" }}
+{{ define "graphql-query-filter" }}
 {{ .Table.FilterVar }} := filter.NewCursorInput("{{ .Table.Title }}Filter", graphql.InputObjectConfigFieldMap{
-{{- range .Table.GraphqlArgs }}
+{{- range .Table.GraphqlQueryArgs }}
   "{{ .Name }}": &graphql.InputObjectFieldConfig{
-    Type: {{ .Type }},
+    Type: {{ if .NonNull }} graphql.NewNonNull({{ .Type }}) {{ else }} {{ .Type }} {{ end }},
   },
 {{- end }}
 })
 {{- end }}
 
-{{ define "graphql-entry" }}
+{{ define "graphql-query-entry" }}
 "{{ .Table.Name }}": &graphql.Field{
-	Type: graphql.NewList({{ .Table.GraphqlVar }}),
+  Type: graphql.NewList({{ .Table.GraphqlVar }}),
   Args: {{ .Table.FilterVar }},
-  Resolve: batcher.GraphqlField[*{{ .Table.GoType }}](pq, func(p graphql.ResolveParams) (string, []any) {
-    return filter.SQL("{{ .Table.SQL }}", nil, p)
+  Resolve: batcher.GraphqlAll[*{{ .Table.GoType }}](pq, func(p graphql.ResolveParams) (string, []any) {
+    return filter.SQL("{{ .Table.SelectSQL }}", nil, p)
+  }),
+}
+{{- end }}
+
+{{ define "graphql-mutate-entry" }}
+{{ $args := .Table.GraphqlCreateArgs }}
+"create{{ .Table.Title }}": &graphql.Field{
+  Type: {{ .Table.GraphqlVar }},
+  Args: graphql.FieldConfigArgument{
+  {{- range $args }}
+    "{{ .Name }}": &graphql.ArgumentConfig{
+      Type: {{ if .NonNull }} graphql.NewNonNull({{ .Type }}) {{ else }} {{ .Type }} {{ end }},
+    },
+  {{ end }}
+  },
+  Resolve: batcher.GraphqlOne[*{{ .Table.GoType }}](pq, func(p graphql.ResolveParams) (string, []any) {
+    return "{{ .Table.InsertSQL}}", []any{
+    {{- range $args }} p.Args["{{ .Name }}"], {{ end }}
+    }
   }),
 }
 {{- end }}
@@ -51,33 +70,33 @@ type {{ .Table.GoType }} struct {
 {{ $ref := . }}
 
 {{ $ref.Table.Var }}{{ $.Table.Title }}Loader := batcher.NewLoader(
-	pq,
-	func(v *{{ $.Table.GoType }}) {{ $ref.ForeignColumn.GoType }} {
-		return v.{{ $ref.ForeignColumn.Title }}
-	},
-	"{{ $.Table.SQL $ref.ForeignColumn.Name }}",
+  pq,
+  func(v *{{ $.Table.GoType }}) {{ $ref.ForeignColumn.GoType }} {
+    return v.{{ $ref.ForeignColumn.Title }}
+  },
+  "{{ $.Table.SelectSQL $ref.ForeignColumn.Name }}",
 )
 {{ $ref.Table.GraphqlVar }}.AddFieldConfig("{{ $.Table.Name }}", &graphql.Field{
-	Type: {{ $.Table.GraphqlVar }},
-	Resolve: func(p graphql.ResolveParams) (any, error) {
-		thunk := {{ $ref.Table.Var }}{{ $.Table.Title }}Loader.Load(p.Context, p.Source.(*{{ $ref.Table.GoType }}).{{ $ref.Column.Title }})
-		return func() (any, error) { return thunk() }, nil
-	},
+  Type: {{ $.Table.GraphqlVar }},
+  Resolve: func(p graphql.ResolveParams) (any, error) {
+    thunk := {{ $ref.Table.Var }}{{ $.Table.Title }}Loader.Load(p.Context, p.Source.(*{{ $ref.Table.GoType }}).{{ $ref.Column.Title }})
+    return func() (any, error) { return thunk() }, nil
+  },
 })
 
 {{ $.Table.Var }}{{ $ref.Table.Title }}Loader := batcher.NewListLoader(
-	pq,
-	func(v *{{ $ref.Table.GoType }}) {{ $ref.Column.GoType }} {
-		return v.{{ $ref.Column.Title }}
-	},
-	"{{ $ref.Table.SQL $ref.Column.Name }}",
+  pq,
+  func(v *{{ $ref.Table.GoType }}) {{ $ref.Column.GoType }} {
+    return v.{{ $ref.Column.Title }}
+  },
+  "{{ $ref.Table.SelectSQL $ref.Column.Name }}",
 )
 {{ $.Table.GraphqlVar }}.AddFieldConfig("{{ $ref.Name }}", &graphql.Field{
-	Type: graphql.NewList({{ $ref.Table.GraphqlVar }}),
-	Resolve: func(p graphql.ResolveParams) (any, error) {
-		thunk := {{ $.Table.Var }}{{ $ref.Table.Title }}Loader.Load(p.Context, p.Source.(*{{ $.Table.GoType }}).{{ $ref.ForeignColumn.Title }})
-		return func() (any, error) { return thunk() }, nil
-	},
+  Type: graphql.NewList({{ $ref.Table.GraphqlVar }}),
+  Resolve: func(p graphql.ResolveParams) (any, error) {
+    thunk := {{ $.Table.Var }}{{ $ref.Table.Title }}Loader.Load(p.Context, p.Source.(*{{ $.Table.GoType }}).{{ $ref.ForeignColumn.Title }})
+    return func() (any, error) { return thunk() }, nil
+  },
 })
 {{ end }}
 {{- end }}
@@ -86,29 +105,35 @@ type {{ .Table.GoType }} struct {
 package {{ .Package.Name }}
 
 import (
-	"github.com/graphql-go/graphql"
-	"github.com/jackc/pgx/v5/pgtype"
-	"github.com/regeda/turboql/pkg/batcher"
-	"github.com/regeda/turboql/pkg/graphqlx/filter"
-	"github.com/regeda/turboql/pkg/graphqlx/scalar"
-	"github.com/stephenafamo/scan/pgxscan"
+  "github.com/graphql-go/graphql"
+  "github.com/jackc/pgx/v5/pgtype"
+  "github.com/regeda/turboql/pkg/batcher"
+  "github.com/regeda/turboql/pkg/graphqlx/filter"
+  "github.com/regeda/turboql/pkg/graphqlx/scalar"
+  "github.com/stephenafamo/scan/pgxscan"
 )
 
 {{- range .Schema.Tables }} {{ template "table-model" (args "Table" .) }} {{ end }}
 
 func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
-	{{- range .Schema.Tables }} {{ template "graphql-object" (args "Table" .) }} {{ end }}
+  {{- range .Schema.Tables }} {{ template "graphql-object" (args "Table" .) }} {{ end }}
 
-  {{- range .Schema.Tables }} {{ template "graphql-filter" (args "Table" .) }} {{ end }}
+  {{- range .Schema.Tables }} {{ template "graphql-query-filter" (args "Table" .) }} {{ end }}
 
-	{{- range .Schema.Tables }} {{ template "graphql-refs" (args "Table" . "References" (.References $.Schema)) }} {{ end }}
+  {{- range .Schema.Tables }} {{ template "graphql-refs" (args "Table" . "References" (.References $.Schema)) }} {{ end }}
 
   return graphql.SchemaConfig{
+    Mutation: graphql.NewObject(graphql.ObjectConfig{
+      Name: "Mutation",
+      Fields: graphql.Fields{
+        {{- range .Schema.Tables }} {{ template "graphql-mutate-entry" (args "Table" .) }}, {{ end }}
+      },
+    }),
     Query: graphql.NewObject(graphql.ObjectConfig{
       Name: "Query",
       Fields: graphql.Fields{
-		    {{- range .Schema.Tables }} {{ template "graphql-entry" (args "Table" .) }},  {{ end }}
-	    },
+        {{- range .Schema.Tables }} {{ template "graphql-query-entry" (args "Table" .) }},  {{ end }}
+      },
     }),
   }
 }

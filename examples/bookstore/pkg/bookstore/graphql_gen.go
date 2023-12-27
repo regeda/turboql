@@ -1056,111 +1056,436 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 	})
 
 	return graphql.SchemaConfig{
+		Mutation: graphql.NewObject(graphql.ObjectConfig{
+			Name: "Mutation",
+			Fields: graphql.Fields{
+
+				"createAddress": &graphql.Field{
+					Type: addressType,
+					Args: graphql.FieldConfigArgument{
+						"address_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"street_number": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+
+						"street_name": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+
+						"city": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+
+						"country_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*Address](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into address(address_id,street_number,street_name,city,country_id)values($1,$2,$3,$4,$5)returning address_id,street_number,street_name,city,country_id", []any{p.Args["address_id"], p.Args["street_number"], p.Args["street_name"], p.Args["city"], p.Args["country_id"]}
+					}),
+				},
+
+				"createAddressStatus": &graphql.Field{
+					Type: addressStatusType,
+					Args: graphql.FieldConfigArgument{
+						"status_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"address_status": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*AddressStatus](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into address_status(status_id,address_status)values($1,$2)returning status_id,address_status", []any{p.Args["status_id"], p.Args["address_status"]}
+					}),
+				},
+
+				"createAuthor": &graphql.Field{
+					Type: authorType,
+					Args: graphql.FieldConfigArgument{
+						"author_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"author_name": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*Author](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into author(author_id,author_name)values($1,$2)returning author_id,author_name", []any{p.Args["author_id"], p.Args["author_name"]}
+					}),
+				},
+
+				"createBook": &graphql.Field{
+					Type: bookType,
+					Args: graphql.FieldConfigArgument{
+						"book_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"title": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+
+						"isbn13": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+
+						"language_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+
+						"num_pages": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+
+						"publication_date": &graphql.ArgumentConfig{
+							Type: scalar.Date,
+						},
+
+						"publisher_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*Book](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into book(book_id,title,isbn13,language_id,num_pages,publication_date,publisher_id)values($1,$2,$3,$4,$5,$6,$7)returning book_id,title,isbn13,language_id,num_pages,publication_date,publisher_id", []any{p.Args["book_id"], p.Args["title"], p.Args["isbn13"], p.Args["language_id"], p.Args["num_pages"], p.Args["publication_date"], p.Args["publisher_id"]}
+					}),
+				},
+
+				"createBookAuthor": &graphql.Field{
+					Type: bookAuthorType,
+					Args: graphql.FieldConfigArgument{
+						"book_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"author_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+					},
+					Resolve: batcher.GraphqlOne[*BookAuthor](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into book_author(book_id,author_id)values($1,$2)returning book_id,author_id", []any{p.Args["book_id"], p.Args["author_id"]}
+					}),
+				},
+
+				"createBookLanguage": &graphql.Field{
+					Type: bookLanguageType,
+					Args: graphql.FieldConfigArgument{
+						"language_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"language_code": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+
+						"language_name": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*BookLanguage](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into book_language(language_id,language_code,language_name)values($1,$2,$3)returning language_id,language_code,language_name", []any{p.Args["language_id"], p.Args["language_code"], p.Args["language_name"]}
+					}),
+				},
+
+				"createCountry": &graphql.Field{
+					Type: countryType,
+					Args: graphql.FieldConfigArgument{
+						"country_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"country_name": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*Country](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into country(country_id,country_name)values($1,$2)returning country_id,country_name", []any{p.Args["country_id"], p.Args["country_name"]}
+					}),
+				},
+
+				"createCustOrder": &graphql.Field{
+					Type: custOrderType,
+					Args: graphql.FieldConfigArgument{
+						"order_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"order_date": &graphql.ArgumentConfig{
+							Type: graphql.DateTime,
+						},
+
+						"customer_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+
+						"shipping_method_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+
+						"dest_address_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*CustOrder](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into cust_order(order_id,order_date,customer_id,shipping_method_id,dest_address_id)values($1,$2,$3,$4,$5)returning order_id,order_date,customer_id,shipping_method_id,dest_address_id", []any{p.Args["order_id"], p.Args["order_date"], p.Args["customer_id"], p.Args["shipping_method_id"], p.Args["dest_address_id"]}
+					}),
+				},
+
+				"createCustomer": &graphql.Field{
+					Type: customerType,
+					Args: graphql.FieldConfigArgument{
+						"customer_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"first_name": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+
+						"last_name": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+
+						"email": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*Customer](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into customer(customer_id,first_name,last_name,email)values($1,$2,$3,$4)returning customer_id,first_name,last_name,email", []any{p.Args["customer_id"], p.Args["first_name"], p.Args["last_name"], p.Args["email"]}
+					}),
+				},
+
+				"createCustomerAddress": &graphql.Field{
+					Type: customerAddressType,
+					Args: graphql.FieldConfigArgument{
+						"customer_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"address_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"status_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*CustomerAddress](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into customer_address(customer_id,address_id,status_id)values($1,$2,$3)returning customer_id,address_id,status_id", []any{p.Args["customer_id"], p.Args["address_id"], p.Args["status_id"]}
+					}),
+				},
+
+				"createOrderHistory": &graphql.Field{
+					Type: orderHistoryType,
+					Args: graphql.FieldConfigArgument{
+						"history_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"order_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+
+						"status_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+
+						"status_date": &graphql.ArgumentConfig{
+							Type: graphql.DateTime,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*OrderHistory](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into order_history(history_id,order_id,status_id,status_date)values($1,$2,$3,$4)returning history_id,order_id,status_id,status_date", []any{p.Args["history_id"], p.Args["order_id"], p.Args["status_id"], p.Args["status_date"]}
+					}),
+				},
+
+				"createOrderLine": &graphql.Field{
+					Type: orderLineType,
+					Args: graphql.FieldConfigArgument{
+						"line_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"order_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+
+						"book_id": &graphql.ArgumentConfig{
+							Type: graphql.Int,
+						},
+
+						"price": &graphql.ArgumentConfig{
+							Type: scalar.Numeric,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*OrderLine](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into order_line(line_id,order_id,book_id,price)values($1,$2,$3,$4)returning line_id,order_id,book_id,price", []any{p.Args["line_id"], p.Args["order_id"], p.Args["book_id"], p.Args["price"]}
+					}),
+				},
+
+				"createOrderStatus": &graphql.Field{
+					Type: orderStatusType,
+					Args: graphql.FieldConfigArgument{
+						"status_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"status_value": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*OrderStatus](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into order_status(status_id,status_value)values($1,$2)returning status_id,status_value", []any{p.Args["status_id"], p.Args["status_value"]}
+					}),
+				},
+
+				"createPublisher": &graphql.Field{
+					Type: publisherType,
+					Args: graphql.FieldConfigArgument{
+						"publisher_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"publisher_name": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*Publisher](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into publisher(publisher_id,publisher_name)values($1,$2)returning publisher_id,publisher_name", []any{p.Args["publisher_id"], p.Args["publisher_name"]}
+					}),
+				},
+
+				"createShippingMethod": &graphql.Field{
+					Type: shippingMethodType,
+					Args: graphql.FieldConfigArgument{
+						"method_id": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(graphql.Int),
+						},
+
+						"method_name": &graphql.ArgumentConfig{
+							Type: graphql.String,
+						},
+
+						"cost": &graphql.ArgumentConfig{
+							Type: scalar.Numeric,
+						},
+					},
+					Resolve: batcher.GraphqlOne[*ShippingMethod](pq, func(p graphql.ResolveParams) (string, []any) {
+						return "insert into shipping_method(method_id,method_name,cost)values($1,$2,$3)returning method_id,method_name,cost", []any{p.Args["method_id"], p.Args["method_name"], p.Args["cost"]}
+					}),
+				},
+			},
+		}),
 		Query: graphql.NewObject(graphql.ObjectConfig{
 			Name: "Query",
 			Fields: graphql.Fields{
 				"address": &graphql.Field{
 					Type: graphql.NewList(addressType),
 					Args: addressFilter,
-					Resolve: batcher.GraphqlField[*Address](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*Address](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select address_id,street_number,street_name,city,country_id from address where 1=1", nil, p)
 					}),
 				},
 				"address_status": &graphql.Field{
 					Type: graphql.NewList(addressStatusType),
 					Args: addressStatusFilter,
-					Resolve: batcher.GraphqlField[*AddressStatus](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*AddressStatus](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select status_id,address_status from address_status where 1=1", nil, p)
 					}),
 				},
 				"author": &graphql.Field{
 					Type: graphql.NewList(authorType),
 					Args: authorFilter,
-					Resolve: batcher.GraphqlField[*Author](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*Author](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select author_id,author_name from author where 1=1", nil, p)
 					}),
 				},
 				"book": &graphql.Field{
 					Type: graphql.NewList(bookType),
 					Args: bookFilter,
-					Resolve: batcher.GraphqlField[*Book](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*Book](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select book_id,title,isbn13,language_id,num_pages,publication_date,publisher_id from book where 1=1", nil, p)
 					}),
 				},
 				"book_author": &graphql.Field{
 					Type: graphql.NewList(bookAuthorType),
 					Args: bookAuthorFilter,
-					Resolve: batcher.GraphqlField[*BookAuthor](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*BookAuthor](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select book_id,author_id from book_author where 1=1", nil, p)
 					}),
 				},
 				"book_language": &graphql.Field{
 					Type: graphql.NewList(bookLanguageType),
 					Args: bookLanguageFilter,
-					Resolve: batcher.GraphqlField[*BookLanguage](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*BookLanguage](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select language_id,language_code,language_name from book_language where 1=1", nil, p)
 					}),
 				},
 				"country": &graphql.Field{
 					Type: graphql.NewList(countryType),
 					Args: countryFilter,
-					Resolve: batcher.GraphqlField[*Country](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*Country](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select country_id,country_name from country where 1=1", nil, p)
 					}),
 				},
 				"cust_order": &graphql.Field{
 					Type: graphql.NewList(custOrderType),
 					Args: custOrderFilter,
-					Resolve: batcher.GraphqlField[*CustOrder](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*CustOrder](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select order_id,order_date,customer_id,shipping_method_id,dest_address_id from cust_order where 1=1", nil, p)
 					}),
 				},
 				"customer": &graphql.Field{
 					Type: graphql.NewList(customerType),
 					Args: customerFilter,
-					Resolve: batcher.GraphqlField[*Customer](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*Customer](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select customer_id,first_name,last_name,email from customer where 1=1", nil, p)
 					}),
 				},
 				"customer_address": &graphql.Field{
 					Type: graphql.NewList(customerAddressType),
 					Args: customerAddressFilter,
-					Resolve: batcher.GraphqlField[*CustomerAddress](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*CustomerAddress](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select customer_id,address_id,status_id from customer_address where 1=1", nil, p)
 					}),
 				},
 				"order_history": &graphql.Field{
 					Type: graphql.NewList(orderHistoryType),
 					Args: orderHistoryFilter,
-					Resolve: batcher.GraphqlField[*OrderHistory](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*OrderHistory](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select history_id,order_id,status_id,status_date from order_history where 1=1", nil, p)
 					}),
 				},
 				"order_line": &graphql.Field{
 					Type: graphql.NewList(orderLineType),
 					Args: orderLineFilter,
-					Resolve: batcher.GraphqlField[*OrderLine](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*OrderLine](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select line_id,order_id,book_id,price from order_line where 1=1", nil, p)
 					}),
 				},
 				"order_status": &graphql.Field{
 					Type: graphql.NewList(orderStatusType),
 					Args: orderStatusFilter,
-					Resolve: batcher.GraphqlField[*OrderStatus](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*OrderStatus](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select status_id,status_value from order_status where 1=1", nil, p)
 					}),
 				},
 				"publisher": &graphql.Field{
 					Type: graphql.NewList(publisherType),
 					Args: publisherFilter,
-					Resolve: batcher.GraphqlField[*Publisher](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*Publisher](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select publisher_id,publisher_name from publisher where 1=1", nil, p)
 					}),
 				},
 				"shipping_method": &graphql.Field{
 					Type: graphql.NewList(shippingMethodType),
 					Args: shippingMethodFilter,
-					Resolve: batcher.GraphqlField[*ShippingMethod](pq, func(p graphql.ResolveParams) (string, []any) {
+					Resolve: batcher.GraphqlAll[*ShippingMethod](pq, func(p graphql.ResolveParams) (string, []any) {
 						return filter.SQL("select method_id,method_name,cost from shipping_method where 1=1", nil, p)
 					}),
 				},
