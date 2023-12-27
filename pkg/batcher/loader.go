@@ -39,7 +39,7 @@ func NewLoader[K comparable, V any](pq pgxscan.Queryer, indexer func(V) K, query
 			mm[indexer(v)] = v
 		}
 		return mapToResult(keys, mm)
-	})
+	}, dataloader.WithClearCacheOnBatch[K, V]())
 }
 
 func NewListLoader[K comparable, V any](pq pgxscan.Queryer, indexer func(V) K, query string) *dataloader.Loader[K, []V] {
@@ -55,7 +55,7 @@ func NewListLoader[K comparable, V any](pq pgxscan.Queryer, indexer func(V) K, q
 			mm[id] = append(mm[id], v)
 		}
 		return mapToResult(keys, mm)
-	})
+	}, dataloader.WithClearCacheOnBatch[K, []V]())
 }
 
 func mapToResult[K comparable, V any](keys []K, m map[K]V) []*dataloader.Result[V] {

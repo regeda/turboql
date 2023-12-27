@@ -88,6 +88,20 @@ func (t Table) InsertSQL() string {
 	return b.String()
 }
 
+func (t Table) DeleteSQL() string {
+	b := new(bytes.Buffer)
+	b.WriteString("delete from ")
+	b.WriteString(t.Name)
+	b.WriteString(" where 1=1")
+	return b.String()
+}
+
+func (t Table) ColumnsSQL() string {
+	b := new(bytes.Buffer)
+	t.writeColumns(b)
+	return b.String()
+}
+
 func (t Table) writeColumns(b *bytes.Buffer) {
 	for i, c := range t.Columns {
 		if i > 0 {

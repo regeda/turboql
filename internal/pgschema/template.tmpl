@@ -30,7 +30,7 @@ type {{ .Table.GoType }} struct {
 {{ .Table.FilterVar }} := filter.NewArgumentConfig("{{ .Table.Title }}Filter", graphql.InputObjectConfigFieldMap{
 {{- range .Table.GraphqlFilterArgs }}
   "{{ .Name }}": &graphql.InputObjectFieldConfig{
-    Type: {{ if .NonNull }} graphql.NewNonNull({{ .Type }}) {{ else }} {{ .Type }} {{ end }},
+    Type: {{ .Type }},
   },
 {{- end }}
 })
@@ -42,7 +42,7 @@ type {{ .Table.GoType }} struct {
   Fields: graphql.InputObjectConfigFieldMap{
   {{- range .Table.GraphqlColumnArgs }}
     "{{ .Name }}": &graphql.InputObjectFieldConfig{
-      Type: {{ if .NonNull }} graphql.NewNonNull({{ .Type }}) {{ else }} {{ .Type }} {{ end }},
+      Type: {{ .Type }},
     },
   {{ end }}
   },
@@ -60,7 +60,6 @@ type {{ .Table.GoType }} struct {
 {{- end }}
 
 {{ define "graphql-mutate-entry" }}
-{{ $args := .Table.GraphqlColumnArgs }}
 "create{{ .Table.Title }}": &graphql.Field{
   Type: {{ .Table.GraphqlVar }},
   Args: graphql.FieldConfigArgument{
@@ -71,8 +70,33 @@ type {{ .Table.GoType }} struct {
   Resolve: batcher.GraphqlOne[*{{ .Table.GoType }}](pq, func(p graphql.ResolveParams) (string, []any) {
     set := p.Args["{{ .Table.Name }}"].(map[string]any)
     return "{{ .Table.InsertSQL}}", []any{
-    {{- range $args }} set["{{ .Name }}"], {{ end }}
+    {{- range .Table.GraphqlColumnArgs }} set["{{ .Name }}"], {{ end }}
     }
+  }),
+},
+"update{{ .Table.Title }}": &graphql.Field{
+  Type: graphql.NewList({{ .Table.GraphqlVar }}),
+  Args: graphql.FieldConfigArgument{
+    "{{ .Table.Name }}": &graphql.ArgumentConfig {
+      Type: graphql.NewNonNull({{ .Table.InputVar }}),
+    },
+    "filter": {{ .Table.FilterVar }},
+  },
+  Resolve: batcher.GraphqlAll[*{{ .Table.GoType }}](pq, func(p graphql.ResolveParams) (string, []any) {
+    set := p.Args["{{ .Table.Name }}"].(map[string]any)
+    sql, args := sqlgen.Update("{{ .Table.Name }}", set)
+    sql, args = filter.SQL(sql, args, p)
+    return sqlgen.Returning(sql, args, "{{ .Table.ColumnsSQL }}")
+  }),
+},
+"delete{{ .Table.Title }}": &graphql.Field{
+  Type: graphql.NewList({{ .Table.GraphqlVar }}),
+  Args: graphql.FieldConfigArgument{
+    "filter": {{ .Table.FilterVar }},
+  },
+  Resolve: batcher.GraphqlAll[*{{ .Table.GoType }}](pq, func(p graphql.ResolveParams) (string, []any) {
+    sql, args := filter.SQL("{{ .Table.DeleteSQL }}", nil, p)
+    return sqlgen.Returning(sql, args, "{{ .Table.ColumnsSQL }}")
   }),
 }
 {{- end }}
@@ -119,6 +143,7 @@ package {{ .Package.Name }}
 import (
   "github.com/graphql-go/graphql"
   "github.com/jackc/pgx/v5/pgtype"
+  "github.com/regeda/turboql/pkg/sqlgen"
   "github.com/regeda/turboql/pkg/batcher"
   "github.com/regeda/turboql/pkg/graphqlx/filter"
   "github.com/regeda/turboql/pkg/graphqlx/scalar"
