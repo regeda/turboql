@@ -47,7 +47,7 @@ migrate-up:
 
 .PHONY: run
 run:
-	go run examples/bookstore/cmd/httpgraphql/main.go
+	go run examples/bookstore/cmd/bookstore/main.go
 
 .PHONY: generate
 generate:

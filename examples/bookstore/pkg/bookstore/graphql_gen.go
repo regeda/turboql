@@ -7,7 +7,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/regeda/turboql/pkg/batcher"
 	"github.com/regeda/turboql/pkg/graphqlx/scalar"
-	"github.com/stephenafamo/scan"
 	"github.com/stephenafamo/scan/pgxscan"
 )
 
@@ -891,94 +890,64 @@ func CreateFields(pq pgxscan.Queryer) graphql.Fields {
 
 	return graphql.Fields{
 		"address": &graphql.Field{
-			Type: graphql.NewList(addressType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Address](), "select address_id,street_number,street_name,city,country_id from address")
-			},
+			Type:    graphql.NewList(addressType),
+			Resolve: batcher.GraphqlField[*Address](pq, "select address_id,street_number,street_name,city,country_id from address"),
 		},
 		"address_status": &graphql.Field{
-			Type: graphql.NewList(address_statusType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Address_status](), "select status_id,address_status from address_status")
-			},
+			Type:    graphql.NewList(address_statusType),
+			Resolve: batcher.GraphqlField[*Address_status](pq, "select status_id,address_status from address_status"),
 		},
 		"author": &graphql.Field{
-			Type: graphql.NewList(authorType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Author](), "select author_id,author_name from author")
-			},
+			Type:    graphql.NewList(authorType),
+			Resolve: batcher.GraphqlField[*Author](pq, "select author_id,author_name from author"),
 		},
 		"book": &graphql.Field{
-			Type: graphql.NewList(bookType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Book](), "select book_id,title,isbn13,language_id,num_pages,publication_date,publisher_id from book")
-			},
+			Type:    graphql.NewList(bookType),
+			Resolve: batcher.GraphqlField[*Book](pq, "select book_id,title,isbn13,language_id,num_pages,publication_date,publisher_id from book"),
 		},
 		"book_author": &graphql.Field{
-			Type: graphql.NewList(book_authorType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Book_author](), "select book_id,author_id from book_author")
-			},
+			Type:    graphql.NewList(book_authorType),
+			Resolve: batcher.GraphqlField[*Book_author](pq, "select book_id,author_id from book_author"),
 		},
 		"book_language": &graphql.Field{
-			Type: graphql.NewList(book_languageType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Book_language](), "select language_id,language_code,language_name from book_language")
-			},
+			Type:    graphql.NewList(book_languageType),
+			Resolve: batcher.GraphqlField[*Book_language](pq, "select language_id,language_code,language_name from book_language"),
 		},
 		"country": &graphql.Field{
-			Type: graphql.NewList(countryType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Country](), "select country_id,country_name from country")
-			},
+			Type:    graphql.NewList(countryType),
+			Resolve: batcher.GraphqlField[*Country](pq, "select country_id,country_name from country"),
 		},
 		"cust_order": &graphql.Field{
-			Type: graphql.NewList(cust_orderType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Cust_order](), "select order_id,order_date,customer_id,shipping_method_id,dest_address_id from cust_order")
-			},
+			Type:    graphql.NewList(cust_orderType),
+			Resolve: batcher.GraphqlField[*Cust_order](pq, "select order_id,order_date,customer_id,shipping_method_id,dest_address_id from cust_order"),
 		},
 		"customer": &graphql.Field{
-			Type: graphql.NewList(customerType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Customer](), "select customer_id,first_name,last_name,email from customer")
-			},
+			Type:    graphql.NewList(customerType),
+			Resolve: batcher.GraphqlField[*Customer](pq, "select customer_id,first_name,last_name,email from customer"),
 		},
 		"customer_address": &graphql.Field{
-			Type: graphql.NewList(customer_addressType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Customer_address](), "select customer_id,address_id,status_id from customer_address")
-			},
+			Type:    graphql.NewList(customer_addressType),
+			Resolve: batcher.GraphqlField[*Customer_address](pq, "select customer_id,address_id,status_id from customer_address"),
 		},
 		"order_history": &graphql.Field{
-			Type: graphql.NewList(order_historyType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Order_history](), "select history_id,order_id,status_id,status_date from order_history")
-			},
+			Type:    graphql.NewList(order_historyType),
+			Resolve: batcher.GraphqlField[*Order_history](pq, "select history_id,order_id,status_id,status_date from order_history"),
 		},
 		"order_line": &graphql.Field{
-			Type: graphql.NewList(order_lineType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Order_line](), "select line_id,order_id,book_id,price from order_line")
-			},
+			Type:    graphql.NewList(order_lineType),
+			Resolve: batcher.GraphqlField[*Order_line](pq, "select line_id,order_id,book_id,price from order_line"),
 		},
 		"order_status": &graphql.Field{
-			Type: graphql.NewList(order_statusType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Order_status](), "select status_id,status_value from order_status")
-			},
+			Type:    graphql.NewList(order_statusType),
+			Resolve: batcher.GraphqlField[*Order_status](pq, "select status_id,status_value from order_status"),
 		},
 		"publisher": &graphql.Field{
-			Type: graphql.NewList(publisherType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Publisher](), "select publisher_id,publisher_name from publisher")
-			},
+			Type:    graphql.NewList(publisherType),
+			Resolve: batcher.GraphqlField[*Publisher](pq, "select publisher_id,publisher_name from publisher"),
 		},
 		"shipping_method": &graphql.Field{
-			Type: graphql.NewList(shipping_methodType),
-			Resolve: func(p graphql.ResolveParams) (any, error) {
-				return pgxscan.All(p.Context, pq, scan.StructMapper[*Shipping_method](), "select method_id,method_name,cost from shipping_method")
-			},
+			Type:    graphql.NewList(shipping_methodType),
+			Resolve: batcher.GraphqlField[*Shipping_method](pq, "select method_id,method_name,cost from shipping_method"),
 		},
 	}
 }

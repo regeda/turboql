@@ -4,9 +4,17 @@ import (
 	"context"
 
 	"github.com/graph-gophers/dataloader/v7"
+	"github.com/graphql-go/graphql"
 	"github.com/stephenafamo/scan"
 	"github.com/stephenafamo/scan/pgxscan"
 )
+
+func GraphqlField[V any](pq pgxscan.Queryer, query string) graphql.FieldResolveFn {
+	mapper := scan.StructMapper[V]()
+	return func(p graphql.ResolveParams) (any, error) {
+		return pgxscan.All(p.Context, pq, mapper, query)
+	}
+}
 
 func NewLoader[K comparable, V any](pq pgxscan.Queryer, indexer func(V) K, query string) *dataloader.Loader[K, V] {
 	mapper := scan.StructMapper[V]()
