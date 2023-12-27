@@ -10,6 +10,7 @@ import (
 	"github.com/regeda/turboql/pkg/batcher"
 	"github.com/regeda/turboql/pkg/graphqlx/filter"
 	"github.com/regeda/turboql/pkg/graphqlx/scalar"
+	"github.com/regeda/turboql/pkg/sqlgen"
 )
 
 type Address struct {
@@ -473,7 +474,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "AddressInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"address_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"street_number": &graphql.InputObjectFieldConfig{
@@ -497,7 +498,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "AddressStatusInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"status_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"address_status": &graphql.InputObjectFieldConfig{
@@ -509,7 +510,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "AuthorInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"author_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"author_name": &graphql.InputObjectFieldConfig{
@@ -521,7 +522,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "BookInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"book_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"title": &graphql.InputObjectFieldConfig{
@@ -553,11 +554,11 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "BookAuthorInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"book_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"author_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 		},
 	})
@@ -565,7 +566,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "BookLanguageInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"language_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"language_code": &graphql.InputObjectFieldConfig{
@@ -581,7 +582,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "CountryInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"country_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"country_name": &graphql.InputObjectFieldConfig{
@@ -593,7 +594,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "CustOrderInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"order_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"order_date": &graphql.InputObjectFieldConfig{
@@ -617,7 +618,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "CustomerInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"customer_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"first_name": &graphql.InputObjectFieldConfig{
@@ -637,11 +638,11 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "CustomerAddressInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"customer_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"address_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"status_id": &graphql.InputObjectFieldConfig{
@@ -653,7 +654,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "OrderHistoryInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"history_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"order_id": &graphql.InputObjectFieldConfig{
@@ -673,7 +674,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "OrderLineInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"line_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"order_id": &graphql.InputObjectFieldConfig{
@@ -693,7 +694,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "OrderStatusInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"status_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"status_value": &graphql.InputObjectFieldConfig{
@@ -705,7 +706,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "PublisherInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"publisher_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"publisher_name": &graphql.InputObjectFieldConfig{
@@ -717,7 +718,7 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Name: "ShippingMethodInput",
 		Fields: graphql.InputObjectConfigFieldMap{
 			"method_id": &graphql.InputObjectFieldConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.Int,
 			},
 
 			"method_name": &graphql.InputObjectFieldConfig{
@@ -1319,7 +1320,6 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 		Mutation: graphql.NewObject(graphql.ObjectConfig{
 			Name: "Mutation",
 			Fields: graphql.Fields{
-
 				"createAddress": &graphql.Field{
 					Type: addressType,
 					Args: graphql.FieldConfigArgument{
@@ -1332,7 +1332,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into address(address_id,street_number,street_name,city,country_id)values($1,$2,$3,$4,$5)returning address_id,street_number,street_name,city,country_id", []any{set["address_id"], set["street_number"], set["street_name"], set["city"], set["country_id"]}
 					}),
 				},
-
+				"updateAddress": &graphql.Field{
+					Type: graphql.NewList(addressType),
+					Args: graphql.FieldConfigArgument{
+						"address": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(addressInput),
+						},
+						"filter": addressFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Address](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["address"].(map[string]any)
+						sql, args := sqlgen.Update("address", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "address_id,street_number,street_name,city,country_id")
+					}),
+				},
+				"deleteAddress": &graphql.Field{
+					Type: graphql.NewList(addressType),
+					Args: graphql.FieldConfigArgument{
+						"filter": addressFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Address](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from address where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "address_id,street_number,street_name,city,country_id")
+					}),
+				},
 				"createAddressStatus": &graphql.Field{
 					Type: addressStatusType,
 					Args: graphql.FieldConfigArgument{
@@ -1345,7 +1369,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into address_status(status_id,address_status)values($1,$2)returning status_id,address_status", []any{set["status_id"], set["address_status"]}
 					}),
 				},
-
+				"updateAddressStatus": &graphql.Field{
+					Type: graphql.NewList(addressStatusType),
+					Args: graphql.FieldConfigArgument{
+						"address_status": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(addressStatusInput),
+						},
+						"filter": addressStatusFilter,
+					},
+					Resolve: batcher.GraphqlAll[*AddressStatus](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["address_status"].(map[string]any)
+						sql, args := sqlgen.Update("address_status", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "status_id,address_status")
+					}),
+				},
+				"deleteAddressStatus": &graphql.Field{
+					Type: graphql.NewList(addressStatusType),
+					Args: graphql.FieldConfigArgument{
+						"filter": addressStatusFilter,
+					},
+					Resolve: batcher.GraphqlAll[*AddressStatus](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from address_status where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "status_id,address_status")
+					}),
+				},
 				"createAuthor": &graphql.Field{
 					Type: authorType,
 					Args: graphql.FieldConfigArgument{
@@ -1358,7 +1406,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into author(author_id,author_name)values($1,$2)returning author_id,author_name", []any{set["author_id"], set["author_name"]}
 					}),
 				},
-
+				"updateAuthor": &graphql.Field{
+					Type: graphql.NewList(authorType),
+					Args: graphql.FieldConfigArgument{
+						"author": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(authorInput),
+						},
+						"filter": authorFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Author](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["author"].(map[string]any)
+						sql, args := sqlgen.Update("author", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "author_id,author_name")
+					}),
+				},
+				"deleteAuthor": &graphql.Field{
+					Type: graphql.NewList(authorType),
+					Args: graphql.FieldConfigArgument{
+						"filter": authorFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Author](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from author where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "author_id,author_name")
+					}),
+				},
 				"createBook": &graphql.Field{
 					Type: bookType,
 					Args: graphql.FieldConfigArgument{
@@ -1371,7 +1443,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into book(book_id,title,isbn13,language_id,num_pages,publication_date,publisher_id)values($1,$2,$3,$4,$5,$6,$7)returning book_id,title,isbn13,language_id,num_pages,publication_date,publisher_id", []any{set["book_id"], set["title"], set["isbn13"], set["language_id"], set["num_pages"], set["publication_date"], set["publisher_id"]}
 					}),
 				},
-
+				"updateBook": &graphql.Field{
+					Type: graphql.NewList(bookType),
+					Args: graphql.FieldConfigArgument{
+						"book": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(bookInput),
+						},
+						"filter": bookFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Book](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["book"].(map[string]any)
+						sql, args := sqlgen.Update("book", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "book_id,title,isbn13,language_id,num_pages,publication_date,publisher_id")
+					}),
+				},
+				"deleteBook": &graphql.Field{
+					Type: graphql.NewList(bookType),
+					Args: graphql.FieldConfigArgument{
+						"filter": bookFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Book](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from book where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "book_id,title,isbn13,language_id,num_pages,publication_date,publisher_id")
+					}),
+				},
 				"createBookAuthor": &graphql.Field{
 					Type: bookAuthorType,
 					Args: graphql.FieldConfigArgument{
@@ -1384,7 +1480,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into book_author(book_id,author_id)values($1,$2)returning book_id,author_id", []any{set["book_id"], set["author_id"]}
 					}),
 				},
-
+				"updateBookAuthor": &graphql.Field{
+					Type: graphql.NewList(bookAuthorType),
+					Args: graphql.FieldConfigArgument{
+						"book_author": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(bookAuthorInput),
+						},
+						"filter": bookAuthorFilter,
+					},
+					Resolve: batcher.GraphqlAll[*BookAuthor](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["book_author"].(map[string]any)
+						sql, args := sqlgen.Update("book_author", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "book_id,author_id")
+					}),
+				},
+				"deleteBookAuthor": &graphql.Field{
+					Type: graphql.NewList(bookAuthorType),
+					Args: graphql.FieldConfigArgument{
+						"filter": bookAuthorFilter,
+					},
+					Resolve: batcher.GraphqlAll[*BookAuthor](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from book_author where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "book_id,author_id")
+					}),
+				},
 				"createBookLanguage": &graphql.Field{
 					Type: bookLanguageType,
 					Args: graphql.FieldConfigArgument{
@@ -1397,7 +1517,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into book_language(language_id,language_code,language_name)values($1,$2,$3)returning language_id,language_code,language_name", []any{set["language_id"], set["language_code"], set["language_name"]}
 					}),
 				},
-
+				"updateBookLanguage": &graphql.Field{
+					Type: graphql.NewList(bookLanguageType),
+					Args: graphql.FieldConfigArgument{
+						"book_language": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(bookLanguageInput),
+						},
+						"filter": bookLanguageFilter,
+					},
+					Resolve: batcher.GraphqlAll[*BookLanguage](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["book_language"].(map[string]any)
+						sql, args := sqlgen.Update("book_language", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "language_id,language_code,language_name")
+					}),
+				},
+				"deleteBookLanguage": &graphql.Field{
+					Type: graphql.NewList(bookLanguageType),
+					Args: graphql.FieldConfigArgument{
+						"filter": bookLanguageFilter,
+					},
+					Resolve: batcher.GraphqlAll[*BookLanguage](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from book_language where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "language_id,language_code,language_name")
+					}),
+				},
 				"createCountry": &graphql.Field{
 					Type: countryType,
 					Args: graphql.FieldConfigArgument{
@@ -1410,7 +1554,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into country(country_id,country_name)values($1,$2)returning country_id,country_name", []any{set["country_id"], set["country_name"]}
 					}),
 				},
-
+				"updateCountry": &graphql.Field{
+					Type: graphql.NewList(countryType),
+					Args: graphql.FieldConfigArgument{
+						"country": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(countryInput),
+						},
+						"filter": countryFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Country](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["country"].(map[string]any)
+						sql, args := sqlgen.Update("country", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "country_id,country_name")
+					}),
+				},
+				"deleteCountry": &graphql.Field{
+					Type: graphql.NewList(countryType),
+					Args: graphql.FieldConfigArgument{
+						"filter": countryFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Country](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from country where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "country_id,country_name")
+					}),
+				},
 				"createCustOrder": &graphql.Field{
 					Type: custOrderType,
 					Args: graphql.FieldConfigArgument{
@@ -1423,7 +1591,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into cust_order(order_id,order_date,customer_id,shipping_method_id,dest_address_id)values($1,$2,$3,$4,$5)returning order_id,order_date,customer_id,shipping_method_id,dest_address_id", []any{set["order_id"], set["order_date"], set["customer_id"], set["shipping_method_id"], set["dest_address_id"]}
 					}),
 				},
-
+				"updateCustOrder": &graphql.Field{
+					Type: graphql.NewList(custOrderType),
+					Args: graphql.FieldConfigArgument{
+						"cust_order": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(custOrderInput),
+						},
+						"filter": custOrderFilter,
+					},
+					Resolve: batcher.GraphqlAll[*CustOrder](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["cust_order"].(map[string]any)
+						sql, args := sqlgen.Update("cust_order", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "order_id,order_date,customer_id,shipping_method_id,dest_address_id")
+					}),
+				},
+				"deleteCustOrder": &graphql.Field{
+					Type: graphql.NewList(custOrderType),
+					Args: graphql.FieldConfigArgument{
+						"filter": custOrderFilter,
+					},
+					Resolve: batcher.GraphqlAll[*CustOrder](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from cust_order where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "order_id,order_date,customer_id,shipping_method_id,dest_address_id")
+					}),
+				},
 				"createCustomer": &graphql.Field{
 					Type: customerType,
 					Args: graphql.FieldConfigArgument{
@@ -1436,7 +1628,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into customer(customer_id,first_name,last_name,email)values($1,$2,$3,$4)returning customer_id,first_name,last_name,email", []any{set["customer_id"], set["first_name"], set["last_name"], set["email"]}
 					}),
 				},
-
+				"updateCustomer": &graphql.Field{
+					Type: graphql.NewList(customerType),
+					Args: graphql.FieldConfigArgument{
+						"customer": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(customerInput),
+						},
+						"filter": customerFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Customer](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["customer"].(map[string]any)
+						sql, args := sqlgen.Update("customer", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "customer_id,first_name,last_name,email")
+					}),
+				},
+				"deleteCustomer": &graphql.Field{
+					Type: graphql.NewList(customerType),
+					Args: graphql.FieldConfigArgument{
+						"filter": customerFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Customer](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from customer where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "customer_id,first_name,last_name,email")
+					}),
+				},
 				"createCustomerAddress": &graphql.Field{
 					Type: customerAddressType,
 					Args: graphql.FieldConfigArgument{
@@ -1449,7 +1665,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into customer_address(customer_id,address_id,status_id)values($1,$2,$3)returning customer_id,address_id,status_id", []any{set["customer_id"], set["address_id"], set["status_id"]}
 					}),
 				},
-
+				"updateCustomerAddress": &graphql.Field{
+					Type: graphql.NewList(customerAddressType),
+					Args: graphql.FieldConfigArgument{
+						"customer_address": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(customerAddressInput),
+						},
+						"filter": customerAddressFilter,
+					},
+					Resolve: batcher.GraphqlAll[*CustomerAddress](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["customer_address"].(map[string]any)
+						sql, args := sqlgen.Update("customer_address", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "customer_id,address_id,status_id")
+					}),
+				},
+				"deleteCustomerAddress": &graphql.Field{
+					Type: graphql.NewList(customerAddressType),
+					Args: graphql.FieldConfigArgument{
+						"filter": customerAddressFilter,
+					},
+					Resolve: batcher.GraphqlAll[*CustomerAddress](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from customer_address where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "customer_id,address_id,status_id")
+					}),
+				},
 				"createOrderHistory": &graphql.Field{
 					Type: orderHistoryType,
 					Args: graphql.FieldConfigArgument{
@@ -1462,7 +1702,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into order_history(history_id,order_id,status_id,status_date)values($1,$2,$3,$4)returning history_id,order_id,status_id,status_date", []any{set["history_id"], set["order_id"], set["status_id"], set["status_date"]}
 					}),
 				},
-
+				"updateOrderHistory": &graphql.Field{
+					Type: graphql.NewList(orderHistoryType),
+					Args: graphql.FieldConfigArgument{
+						"order_history": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(orderHistoryInput),
+						},
+						"filter": orderHistoryFilter,
+					},
+					Resolve: batcher.GraphqlAll[*OrderHistory](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["order_history"].(map[string]any)
+						sql, args := sqlgen.Update("order_history", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "history_id,order_id,status_id,status_date")
+					}),
+				},
+				"deleteOrderHistory": &graphql.Field{
+					Type: graphql.NewList(orderHistoryType),
+					Args: graphql.FieldConfigArgument{
+						"filter": orderHistoryFilter,
+					},
+					Resolve: batcher.GraphqlAll[*OrderHistory](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from order_history where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "history_id,order_id,status_id,status_date")
+					}),
+				},
 				"createOrderLine": &graphql.Field{
 					Type: orderLineType,
 					Args: graphql.FieldConfigArgument{
@@ -1475,7 +1739,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into order_line(line_id,order_id,book_id,price)values($1,$2,$3,$4)returning line_id,order_id,book_id,price", []any{set["line_id"], set["order_id"], set["book_id"], set["price"]}
 					}),
 				},
-
+				"updateOrderLine": &graphql.Field{
+					Type: graphql.NewList(orderLineType),
+					Args: graphql.FieldConfigArgument{
+						"order_line": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(orderLineInput),
+						},
+						"filter": orderLineFilter,
+					},
+					Resolve: batcher.GraphqlAll[*OrderLine](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["order_line"].(map[string]any)
+						sql, args := sqlgen.Update("order_line", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "line_id,order_id,book_id,price")
+					}),
+				},
+				"deleteOrderLine": &graphql.Field{
+					Type: graphql.NewList(orderLineType),
+					Args: graphql.FieldConfigArgument{
+						"filter": orderLineFilter,
+					},
+					Resolve: batcher.GraphqlAll[*OrderLine](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from order_line where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "line_id,order_id,book_id,price")
+					}),
+				},
 				"createOrderStatus": &graphql.Field{
 					Type: orderStatusType,
 					Args: graphql.FieldConfigArgument{
@@ -1488,7 +1776,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into order_status(status_id,status_value)values($1,$2)returning status_id,status_value", []any{set["status_id"], set["status_value"]}
 					}),
 				},
-
+				"updateOrderStatus": &graphql.Field{
+					Type: graphql.NewList(orderStatusType),
+					Args: graphql.FieldConfigArgument{
+						"order_status": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(orderStatusInput),
+						},
+						"filter": orderStatusFilter,
+					},
+					Resolve: batcher.GraphqlAll[*OrderStatus](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["order_status"].(map[string]any)
+						sql, args := sqlgen.Update("order_status", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "status_id,status_value")
+					}),
+				},
+				"deleteOrderStatus": &graphql.Field{
+					Type: graphql.NewList(orderStatusType),
+					Args: graphql.FieldConfigArgument{
+						"filter": orderStatusFilter,
+					},
+					Resolve: batcher.GraphqlAll[*OrderStatus](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from order_status where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "status_id,status_value")
+					}),
+				},
 				"createPublisher": &graphql.Field{
 					Type: publisherType,
 					Args: graphql.FieldConfigArgument{
@@ -1501,7 +1813,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 						return "insert into publisher(publisher_id,publisher_name)values($1,$2)returning publisher_id,publisher_name", []any{set["publisher_id"], set["publisher_name"]}
 					}),
 				},
-
+				"updatePublisher": &graphql.Field{
+					Type: graphql.NewList(publisherType),
+					Args: graphql.FieldConfigArgument{
+						"publisher": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(publisherInput),
+						},
+						"filter": publisherFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Publisher](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["publisher"].(map[string]any)
+						sql, args := sqlgen.Update("publisher", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "publisher_id,publisher_name")
+					}),
+				},
+				"deletePublisher": &graphql.Field{
+					Type: graphql.NewList(publisherType),
+					Args: graphql.FieldConfigArgument{
+						"filter": publisherFilter,
+					},
+					Resolve: batcher.GraphqlAll[*Publisher](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from publisher where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "publisher_id,publisher_name")
+					}),
+				},
 				"createShippingMethod": &graphql.Field{
 					Type: shippingMethodType,
 					Args: graphql.FieldConfigArgument{
@@ -1512,6 +1848,31 @@ func NewSchemaConfig(pq pgxscan.Queryer) graphql.SchemaConfig {
 					Resolve: batcher.GraphqlOne[*ShippingMethod](pq, func(p graphql.ResolveParams) (string, []any) {
 						set := p.Args["shipping_method"].(map[string]any)
 						return "insert into shipping_method(method_id,method_name,cost)values($1,$2,$3)returning method_id,method_name,cost", []any{set["method_id"], set["method_name"], set["cost"]}
+					}),
+				},
+				"updateShippingMethod": &graphql.Field{
+					Type: graphql.NewList(shippingMethodType),
+					Args: graphql.FieldConfigArgument{
+						"shipping_method": &graphql.ArgumentConfig{
+							Type: graphql.NewNonNull(shippingMethodInput),
+						},
+						"filter": shippingMethodFilter,
+					},
+					Resolve: batcher.GraphqlAll[*ShippingMethod](pq, func(p graphql.ResolveParams) (string, []any) {
+						set := p.Args["shipping_method"].(map[string]any)
+						sql, args := sqlgen.Update("shipping_method", set)
+						sql, args = filter.SQL(sql, args, p)
+						return sqlgen.Returning(sql, args, "method_id,method_name,cost")
+					}),
+				},
+				"deleteShippingMethod": &graphql.Field{
+					Type: graphql.NewList(shippingMethodType),
+					Args: graphql.FieldConfigArgument{
+						"filter": shippingMethodFilter,
+					},
+					Resolve: batcher.GraphqlAll[*ShippingMethod](pq, func(p graphql.ResolveParams) (string, []any) {
+						sql, args := filter.SQL("delete from shipping_method where 1=1", nil, p)
+						return sqlgen.Returning(sql, args, "method_id,method_name,cost")
 					}),
 				},
 			},
