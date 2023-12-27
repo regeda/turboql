@@ -42,6 +42,10 @@ func (t Table) FilterVar() string {
 	return t.Var() + "Filter"
 }
 
+func (t Table) InputVar() string {
+	return t.Var() + "Input"
+}
+
 func (t Table) GoType() string {
 	return t.Title()
 }
@@ -93,7 +97,7 @@ func (t Table) writeColumns(b *bytes.Buffer) {
 	}
 }
 
-func (t Table) GraphqlQueryArgs() []graphqlx.Arg {
+func (t Table) GraphqlFilterArgs() []graphqlx.Arg {
 	var args []graphqlx.Arg
 	for _, c := range t.Columns {
 		if f, ok := c.FilterType(); ok {
@@ -106,7 +110,7 @@ func (t Table) GraphqlQueryArgs() []graphqlx.Arg {
 	return args
 }
 
-func (t Table) GraphqlCreateArgs() []graphqlx.Arg {
+func (t Table) GraphqlColumnArgs() []graphqlx.Arg {
 	var args []graphqlx.Arg
 	for _, c := range t.Columns {
 		args = append(args, graphqlx.Arg{
