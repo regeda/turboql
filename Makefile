@@ -53,7 +53,7 @@ run:
 generate:
 	mkdir -p examples/bookstore/pkg/bookstore
 	go run cmd/turboqlgen/main.go --package-name=bookstore > examples/bookstore/pkg/bookstore/graphql_gen.go
-	goimports -w .
+	goimports -w -local github.com/regeda/turboql .
 
 .PHONY: test
 test:
