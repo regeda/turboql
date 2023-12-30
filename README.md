@@ -13,6 +13,8 @@ Setup the generator:
 go install github.com/regeda/turboql/cmd/turboqlgen
 ```
 
+> How to install [Golang](https://go.dev/doc/install)?
+
 Connect to your database and generate the GraphQL schema:
 ```
 PG_URI='postgres://localhost:5432/postgres?sslmode=disable' turboqlgen
