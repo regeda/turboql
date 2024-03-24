@@ -10,7 +10,7 @@ require (
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/pkg/errors v0.9.1
 	github.com/stephenafamo/scan v0.5.0
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.9.0
 )
 
 require (
