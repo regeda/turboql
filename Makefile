@@ -15,11 +15,14 @@ export PG_URI := postgresql://$(PG_DSN)
 
 GOFLAGS ?=
 
-$(GOBIN):
-	mkdir -p $(GOBIN)
+.PHONY: default
+default: docker-down docker-up clean lint tidy migrate-up generate test run
 
 $(GOBIN)/golangci-lint: $(GOBIN)
 	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOBIN) v$(GOLANGLINT_VERSION)
+
+$(GOBIN):
+	mkdir -p $(GOBIN)
 
 .PHONY: clean
 clean:
