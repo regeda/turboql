@@ -7,7 +7,7 @@ require (
 	github.com/graphql-go/graphql v0.8.1
 	github.com/graphql-go/handler v0.2.4
 	github.com/iancoleman/strcase v0.3.0
-	github.com/jackc/pgx/v5 v5.7.1
+	github.com/jackc/pgx/v5 v5.7.2
 	github.com/pkg/errors v0.9.1
 	github.com/stephenafamo/scan v0.6.1
 	github.com/stretchr/testify v1.10.0
@@ -21,8 +21,8 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
-	golang.org/x/crypto v0.27.0 // indirect
-	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
+	golang.org/x/crypto v0.31.0 // indirect
+	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/text v0.21.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
