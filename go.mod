@@ -9,7 +9,7 @@ require (
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/pkg/errors v0.9.1
-	github.com/stephenafamo/scan v0.6.1
+	github.com/stephenafamo/scan v0.6.2
 	github.com/stretchr/testify v1.10.0
 )
 
